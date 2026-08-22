@@ -1,11 +1,13 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.join(__dirname),
+  },
   serverExternalPackages: [
-    "@prisma/client",
     "@prisma/adapter-neon",
     "@neondatabase/serverless",
-    "@/generated/prisma",
   ],
 };
 
