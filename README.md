@@ -28,8 +28,9 @@ Optional: set `NVIDIA_API_KEY` locally in `.env` (gitignored) for NVIDIA Integra
 ## Deploy on Vercel
 
 1. Import [this GitHub repo](https://github.com/KhunSama/CURSOR-BUILD-PROJECT) in [Vercel](https://vercel.com/new).
-2. Add a **Postgres** store (Storage → Create Database → Postgres / Neon) or paste a Neon `DATABASE_URL`.
-3. Set environment variables (Production + Preview):
+2. Set the production branch to **`main`** (or `vercel-deploy` until you merge).
+3. Add a **Postgres** store (Storage → Create Database → Postgres / Neon) or paste a Neon `DATABASE_URL`.
+4. Set environment variables (Production + Preview):
 
 | Name | Required | Notes |
 | --- | --- | --- |
@@ -43,7 +44,9 @@ Vercel → Project → Settings → Environment Variables. Add `NVIDIA_API_KEY` 
 
 If the key is missing, the UI shows a warning and uses the built-in fallback instead of pretending NVIDIA answered.
 
-4. Deploy. The build runs `prisma generate`, then `prisma db push` **only if** a real Postgres URL is set (`DATABASE_URL` / `POSTGRES_URL_NON_POOLING`), then `next build`. If `db push` is skipped, add a Postgres store and redeploy so tables get created.
+5. Deploy. The build runs `prisma generate`, then `prisma db push` **only if** a real Postgres URL is set (`DATABASE_URL` / `POSTGRES_URL_NON_POOLING`), then `next build`. If `db push` is skipped, add a Postgres store and redeploy so tables get created.
+
+Pushing to `main` or `vercel-deploy` also calls the Vercel deploy hook.
 
 SQLite is not used in production. Vercel serverless filesystems are ephemeral, so the database must be hosted Postgres.
 
