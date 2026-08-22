@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
   "buildCommand": "node scripts/vercel-build.mjs",
-  "installCommand": "npm install && npx prisma generate",
+  "installCommand": "npm install --ignore-scripts=false && npx prisma generate",
   "env": {
     "NVIDIA_BASE_URL": "https://integrate.api.nvidia.com/v1",
     "NVIDIA_MODEL": "openai/gpt-oss-20b"
