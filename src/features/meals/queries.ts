@@ -3,6 +3,7 @@ import { localDateKey } from "@/shared/lib/dates";
 import { sumItems } from "@/features/nutrition/tdee";
 import { QUESTS } from "@/features/game/config";
 import { getXpSummary } from "@/features/game/engine";
+import type { MealView, QuestRow } from "@/types/db";
 
 export async function getDashboardData(userId: string, date = localDateKey()) {
   const [goal, profile, meals, streak, achievements, quests, xp] =
@@ -20,9 +21,9 @@ export async function getDashboardData(userId: string, date = localDateKey()) {
       getXpSummary(userId),
     ]);
 
-  const totals = sumItems(meals.flatMap((m) => m.items));
+  const totals = sumItems(meals.flatMap((m: MealView) => m.items));
   const questView = QUESTS.map((q) => {
-    const row = quests.find((u) => u.questKey === q.key);
+    const row = quests.find((u: QuestRow) => u.questKey === q.key);
     return { ...q, completed: Boolean(row?.completed) };
   });
 
@@ -50,5 +51,5 @@ export async function getMealsForDate(userId: string, date = localDateKey()) {
     where: { userId, loggedOn: date, confirmed: true },
     include: { items: true },
     orderBy: { createdAt: "desc" },
-  });
+  }) as Promise<MealView[]>;
 }

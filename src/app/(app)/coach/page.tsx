@@ -11,7 +11,7 @@ export default async function CoachPage() {
       <h1 className="font-display text-3xl text-gold">AI coach</h1>
       <CoachChat
         aiReady={nvidiaConfigured()}
-        initial={history.map((m) => ({
+        initial={history.map((m: { id: string; role: string; content: string }) => ({
           id: m.id,
           role: m.role,
           content: m.content,

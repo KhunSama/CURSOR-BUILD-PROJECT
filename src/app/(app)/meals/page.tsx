@@ -3,6 +3,7 @@ import { requireOnboarded } from "@/server/auth/guards";
 import { getMealsForDate } from "@/features/meals/queries";
 import { deleteMealAction } from "@/features/meals/actions";
 import { sumItems } from "@/features/nutrition/tdee";
+import type { MealItemView, MealView } from "@/types/db";
 
 export default async function MealsPage() {
   const session = await requireOnboarded();
@@ -19,7 +20,7 @@ export default async function MealsPage() {
       {meals.length === 0 ? (
         <p className="text-foreground/70">No meals confirmed yet today.</p>
       ) : (
-        meals.map((meal) => {
+        meals.map((meal: MealView) => {
           const t = sumItems(meal.items);
           return (
             <article key={meal.id} className="rounded-2xl border border-stroke bg-panel p-4">
@@ -39,7 +40,7 @@ export default async function MealsPage() {
                 </form>
               </div>
               <ul className="mt-2 text-sm">
-                {meal.items.map((item) => (
+                {meal.items.map((item: MealItemView) => (
                   <li key={item.id}>
                     {item.name} ({item.serving}) — {item.calories} kcal, {item.proteinG}p /{" "}
                     {item.carbsG}c / {item.fatG}f

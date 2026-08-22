@@ -51,7 +51,7 @@ export default async function ProgressPage({
         <section className="rounded-2xl border border-stroke bg-panel p-4 text-sm">
           <h2 className="font-display text-gold">Weight log</h2>
           <ul>
-            {data.weights.map((w) => (
+            {data.weights.map((w: { id: string; loggedOn: string; kg: number }) => (
               <li key={w.id}>
                 {w.loggedOn}: {w.kg} kg
               </li>

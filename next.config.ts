@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     "@prisma/client",
     "@prisma/adapter-neon",
     "@neondatabase/serverless",
+    "@/generated/prisma",
   ],
 };
 

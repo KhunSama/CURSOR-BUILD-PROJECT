@@ -61,27 +61,27 @@ model User {
 }
 
 model Profile {
-  id        String         @id @default(cuid())
-  userId    String         @unique
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String        @id @default(cuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   age       Int
   sex       Sex
   heightCm  Float
   weightKg  Float
   activity  ActivityLevel
   goal      PrimaryGoal
-  title     String         @default("Novice Tracker")
-  avatarKey String         @default("scout")
+  title     String        @default("Novice Tracker")
+  avatarKey String        @default("scout")
 }
 
 model NutritionGoal {
-  id        String @id @default(cuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  calories  Int
-  proteinG  Int
-  carbsG    Int
-  fatG      Int
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calories Int
+  proteinG Int
+  carbsG   Int
+  fatG     Int
 }
 
 model Meal {
@@ -99,15 +99,15 @@ model Meal {
 }
 
 model MealItem {
-  id        String @id @default(cuid())
-  mealId    String
-  meal      Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
-  name      String
-  serving   String
-  calories  Int
-  proteinG  Float
-  carbsG    Float
-  fatG      Float
+  id       String @id @default(cuid())
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  name     String
+  serving  String
+  calories Int
+  proteinG Float
+  carbsG   Float
+  fatG     Float
 }
 
 model XpTransaction {
@@ -122,23 +122,23 @@ model XpTransaction {
 }
 
 model UserQuest {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   questKey  String
   date      String
-  completed Boolean  @default(false)
-  xpAwarded Int      @default(0)
+  completed Boolean @default(false)
+  xpAwarded Int     @default(0)
 
   @@unique([userId, questKey, date])
 }
 
 model UserAchievement {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  key         String
-  unlockedAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key        String
+  unlockedAt DateTime @default(now())
 
   @@unique([userId, key])
 }

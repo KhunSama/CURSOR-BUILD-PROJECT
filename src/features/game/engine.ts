@@ -3,6 +3,7 @@ import { localDateKey } from "@/shared/lib/dates";
 import { QUESTS, XP, levelFromXp, titleForLevel } from "@/features/game/config";
 import { nextStreak } from "@/features/game/streak";
 import { sumItems } from "@/features/nutrition/tdee";
+import type { MealView } from "@/types/db";
 
 type Totals = { calories: number; proteinG: number; carbsG: number; fatG: number };
 
@@ -59,7 +60,7 @@ export async function afterMealConfirmed(userId: string, date = localDateKey()) 
     where: { userId, loggedOn: date, confirmed: true },
     include: { items: true },
   });
-  const totals = sumItems(meals.flatMap((m) => m.items));
+  const totals = sumItems(meals.flatMap((m: MealView) => m.items));
 
   if (goal) {
     await maybeCompleteQuests(userId, date, totals, goal, meals);

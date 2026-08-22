@@ -2,6 +2,7 @@ import { prisma } from "@/server/db";
 import { localDateKey } from "@/shared/lib/dates";
 import { sumItems } from "@/features/nutrition/tdee";
 import { nvidiaChat, nvidiaConfigured } from "@/server/ai/nvidia";
+import type { MealView } from "@/types/db";
 
 const COACH_SYSTEM = `You are an AI nutrition coach for a game-like calorie tracker.
 Give practical, encouraging food ideas. You are NOT a doctor or dietitian.
@@ -27,7 +28,7 @@ export async function coachReply(
       include: { items: true },
     }),
   ]);
-  const totals = sumItems(meals.flatMap((m) => m.items));
+  const totals = sumItems(meals.flatMap((m: MealView) => m.items));
   const context = JSON.stringify({
     goal: profile?.goal,
     targets: goal,
@@ -38,7 +39,7 @@ export async function coachReply(
           proteinG: Math.max(0, goal.proteinG - totals.proteinG),
         }
       : null,
-    meals: meals.map((m) => ({
+    meals: meals.map((m: MealView) => ({
       type: m.mealType,
       items: m.items.map((i) => i.name),
     })),
