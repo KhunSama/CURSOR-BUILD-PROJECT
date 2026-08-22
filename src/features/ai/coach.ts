@@ -8,7 +8,16 @@ Give practical, encouraging food ideas. You are NOT a doctor or dietitian.
 Never diagnose, never recommend extreme calorie restriction, never shame the user.
 Keep answers under 180 words. Mention that calorie numbers are estimates.`;
 
-export async function coachReply(userId: string, question: string) {
+export type CoachResult = {
+  answer: string;
+  source: "nvidia" | "fallback";
+  warning?: string;
+};
+
+export async function coachReply(
+  userId: string,
+  question: string,
+): Promise<CoachResult> {
   const today = localDateKey();
   const [goal, profile, meals] = await Promise.all([
     prisma.nutritionGoal.findUnique({ where: { userId } }),
@@ -39,12 +48,17 @@ export async function coachReply(userId: string, question: string) {
     data: { userId, role: "user", content: question },
   });
 
-  let answer: string;
+  let result: CoachResult;
   if (!nvidiaConfigured()) {
-    answer = fallbackCoach(question, totals, goal);
+    result = {
+      answer: fallbackCoach(question, totals, goal),
+      source: "fallback",
+      warning:
+        "NVIDIA_API_KEY is missing on this host. Add it in Vercel → Settings → Environment Variables (do not commit .env).",
+    };
   } else {
     try {
-      const result = await nvidiaChat({
+      const chat = await nvidiaChat({
         temperature: 1,
         messages: [
           { role: "system", content: COACH_SYSTEM },
@@ -54,17 +68,31 @@ export async function coachReply(userId: string, question: string) {
           },
         ],
       });
-      answer =
-        result?.content.trim() || fallbackCoach(question, totals, goal);
-    } catch {
-      answer = fallbackCoach(question, totals, goal);
+      const text = chat?.content.trim();
+      if (text) {
+        result = { answer: text, source: "nvidia" };
+      } else {
+        result = {
+          answer: fallbackCoach(question, totals, goal),
+          source: "fallback",
+          warning: "NVIDIA returned an empty reply. Using the built-in coach.",
+        };
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "NVIDIA request failed";
+      console.error("coachReply NVIDIA error", message);
+      result = {
+        answer: fallbackCoach(question, totals, goal),
+        source: "fallback",
+        warning: message,
+      };
     }
   }
 
   await prisma.coachMessage.create({
-    data: { userId, role: "assistant", content: answer },
+    data: { userId, role: "assistant", content: result.answer },
   });
-  return answer;
+  return result;
 }
 
 function fallbackCoach(

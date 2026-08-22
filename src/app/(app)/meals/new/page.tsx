@@ -1,5 +1,7 @@
 import { MealComposer } from "./meal-composer";
 
+export const maxDuration = 60;
+
 export default async function NewMealPage({
   searchParams,
 }: {

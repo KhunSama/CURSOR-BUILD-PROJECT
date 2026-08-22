@@ -28,9 +28,9 @@ export async function askCoachAction(question: string) {
   const session = await requireOnboarded();
   const q = question.trim();
   if (q.length < 3) return { error: "Ask a short nutrition question." };
-  const answer = await coachReply(session.userId, q.slice(0, 500));
+  const result = await coachReply(session.userId, q.slice(0, 500));
   revalidatePath("/coach");
-  return { answer };
+  return result;
 }
 
 export async function loadCoachHistory() {

@@ -1,12 +1,23 @@
-import path from "node:path";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+function databaseUrl() {
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL;
+  if (!url || url.startsWith("file:")) {
+    throw new Error(
+      "Set DATABASE_URL to a PostgreSQL connection string (Neon or Vercel Postgres). SQLite cannot run on Vercel.",
+    );
+  }
+  return url;
+}
+
 function createClient() {
-  const file = path.join(process.cwd(), "prisma", "dev.db");
-  const adapter = new PrismaBetterSqlite3({ url: file });
+  const adapter = new PrismaNeon({ connectionString: databaseUrl() });
   return new PrismaClient({ adapter });
 }
 

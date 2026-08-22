@@ -13,7 +13,16 @@ export type NvidiaChatResult = {
 };
 
 export function nvidiaConfigured() {
-  return Boolean(process.env.NVIDIA_API_KEY);
+  return Boolean(process.env.NVIDIA_API_KEY?.trim());
+}
+
+function nvidiaConfig() {
+  const apiKey = process.env.NVIDIA_API_KEY?.trim();
+  const baseUrl = (
+    process.env.NVIDIA_BASE_URL ?? "https://integrate.api.nvidia.com/v1"
+  ).replace(/\/$/, "");
+  const model = process.env.NVIDIA_MODEL ?? "openai/gpt-oss-20b";
+  return { apiKey, baseUrl, model };
 }
 
 export async function nvidiaChat(options: {
@@ -21,13 +30,8 @@ export async function nvidiaChat(options: {
   temperature?: number;
   maxTokens?: number;
 }): Promise<NvidiaChatResult | null> {
-  const apiKey = process.env.NVIDIA_API_KEY;
+  const { apiKey, baseUrl, model } = nvidiaConfig();
   if (!apiKey) return null;
-
-  const baseUrl = (
-    process.env.NVIDIA_BASE_URL ?? "https://integrate.api.nvidia.com/v1"
-  ).replace(/\/$/, "");
-  const model = process.env.NVIDIA_MODEL ?? "openai/gpt-oss-20b";
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -45,16 +49,19 @@ export async function nvidiaChat(options: {
     }),
   });
 
+  const raw = await res.text();
   if (!res.ok) {
-    return null;
+    console.error("NVIDIA chat failed", res.status, raw.slice(0, 800));
+    throw new Error(`NVIDIA API ${res.status}: ${raw.slice(0, 180)}`);
   }
 
-  const data = (await res.json()) as { choices?: NvidiaChoice[] };
+  const data = JSON.parse(raw) as { choices?: NvidiaChoice[] };
   const message = data.choices?.[0]?.message;
   const content = message?.content?.trim() ?? "";
   const reasoning = message?.reasoning_content?.trim() || null;
-  if (!content && !reasoning) return null;
-  return { content: content || reasoning || "", reasoning };
+  const text = content || reasoning || "";
+  if (!text) return null;
+  return { content: text, reasoning };
 }
 
 export function extractJsonObject(text: string): string | null {
