@@ -1,0 +1,17 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "node scripts/vercel-build.mjs",
+  "installCommand": "npm install && npx prisma generate",
+  "env": {
+    "NVIDIA_BASE_URL": "https://integrate.api.nvidia.com/v1",
+    "NVIDIA_MODEL": "openai/gpt-oss-20b"
+  },
+  "functions": {
+    "src/app/api/ai/coach/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/ai/analyze/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

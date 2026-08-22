@@ -7,7 +7,7 @@ export default async function AchievementsPage() {
   const unlocked = await prisma.userAchievement.findMany({
     where: { userId: session.userId },
   });
-  const keys = new Set(unlocked.map((u) => u.key));
+  const keys = new Set(unlocked.map((u: { key: string }) => u.key));
   return (
     <main className="flex flex-col gap-4">
       <h1 className="font-display text-3xl text-gold">Achievements</h1>
