@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "prisma generate && prisma db push && next build",
+  "buildCommand": "node scripts/vercel-build.mjs",
   "installCommand": "npm install && npx prisma generate",
   "env": {
     "NVIDIA_BASE_URL": "https://integrate.api.nvidia.com/v1",

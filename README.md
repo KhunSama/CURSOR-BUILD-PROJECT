@@ -43,7 +43,7 @@ Vercel → Project → Settings → Environment Variables. Add `NVIDIA_API_KEY` 
 
 If the key is missing, the UI shows a warning and uses the built-in fallback instead of pretending NVIDIA answered.
 
-4. Deploy. The build runs `prisma generate && prisma db push && next build` so tables are created on first deploy.
+4. Deploy. The build runs `prisma generate`, then `prisma db push` **only if** a real Postgres URL is set (`DATABASE_URL` / `POSTGRES_URL_NON_POOLING`), then `next build`. If `db push` is skipped, add a Postgres store and redeploy so tables get created.
 
 SQLite is not used in production. Vercel serverless filesystems are ephemeral, so the database must be hosted Postgres.
 
