@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Sex {
+  FEMALE
+  MALE
+  OTHER
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum PrimaryGoal {
+  LOSE_WEIGHT
+  MAINTAIN
+  GAIN_WEIGHT
+  BUILD_MUSCLE
+  EAT_HEALTHIER
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum MealSource {
+  MANUAL
+  AI
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  profile          Profile?
+  nutritionGoal    NutritionGoal?
+  streak           Streak?
+  meals            Meal[]
+  xpTransactions   XpTransaction[]
+  userQuests       UserQuest[]
+  userAchievements UserAchievement[]
+  coachMessages    CoachMessage[]
+  resetTokens      PasswordResetToken[]
+  weightLogs       WeightLog[]
+}
+
+model Profile {
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age       Int
+  sex       Sex
+  heightCm  Float
+  weightKg  Float
+  activity  ActivityLevel
+  goal      PrimaryGoal
+  title     String         @default("Novice Tracker")
+  avatarKey String         @default("scout")
+}
+
+model NutritionGoal {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calories  Int
+  proteinG  Int
+  carbsG    Int
+  fatG      Int
+}
+
+model Meal {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealType  MealType
+  loggedOn  String
+  source    MealSource @default(MANUAL)
+  confirmed Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  items     MealItem[]
+
+  @@index([userId, loggedOn])
+}
+
+model MealItem {
+  id        String @id @default(cuid())
+  mealId    String
+  meal      Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  name      String
+  serving   String
+  calories  Int
+  proteinG  Float
+  carbsG    Float
+  fatG      Float
+}
+
+model XpTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model UserQuest {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questKey  String
+  date      String
+  completed Boolean  @default(false)
+  xpAwarded Int      @default(0)
+
+  @@unique([userId, questKey, date])
+}
+
+model UserAchievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key         String
+  unlockedAt  DateTime @default(now())
+
+  @@unique([userId, key])
+}
+
+model Streak {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  current        Int     @default(0)
+  longest        Int     @default(0)
+  lastActiveDate String?
+}
+
+model CoachMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+}
+
+model WeightLog {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kg       Float
+  loggedOn String
+
+  @@index([userId, loggedOn])
+}
